@@ -1,4 +1,4 @@
-//installation de npm bcrypt 3.0.0 package de chiffrement
+//installation de npm bcrypt package de chiffrement
 
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');

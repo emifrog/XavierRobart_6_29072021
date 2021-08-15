@@ -1,5 +1,5 @@
-const jwt = require('jsonwebtoken');
-const dotenv = require("dotenv");
+const jwt = require('jsonwebtoken');  //permet l'echange sécurisé de token entre plusieurs parties
+const dotenv = require("dotenv");  //module qui charge les variables d environnement d un fichier .env dans le process.env
 dotenv.config();
 module.exports = (req, res, next) => {
 

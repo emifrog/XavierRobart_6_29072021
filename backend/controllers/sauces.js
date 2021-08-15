@@ -1,6 +1,6 @@
 // importation du modèle mongoose pour l'utiliser dans l'appli
 const Sauce = require('../models/sauce');
-const fs = require('fs');
+const fs = require('fs');  //permet de modifier le systeme de fichier y compris les supprimer
 //logique metiers
 //permet d'exposer la logique de nos route en tant que fonction pour chaque crud
 
