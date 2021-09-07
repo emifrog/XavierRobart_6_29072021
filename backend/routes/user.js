@@ -1,15 +1,9 @@
-const express = require('express');
-const router = express.Router();
+const express = require('express'); // pour importer express
+const router = express.Router(); // pour créér notre router avec la fonction router de express
+const userCtrl = require('../controllers/user'); // pour importer les controleurs
+const limiter = require('../middleware/limiter-request');// Gestion du nombre de requêtes utilisateurs
 
-
-// Gestion du nombre de requêtes utilisateurs
-const limiter = require('../middleware/Limiter-Request');
-// Controle si l'email de l'utilisateur est déja enregistrer
-const userCtrl = require('../controllers/user');
-// Controle la forme du mot de pass pour forcé l'utilisateur a le complexifier pour la sécurité
-const passwordValidation = require('../middleware/password-validation');
-
-router.post('/signup', passwordValidation, userCtrl.signup);
+router.post('/signup', userCtrl.signup); // pour importer la fonction avec ('URI', nomDuController.nomDeLaRoute)
 router.post('/login', limiter, userCtrl.login);
 
-module.exports = router;
+module.exports = router; // pour exporter le router vers app.js

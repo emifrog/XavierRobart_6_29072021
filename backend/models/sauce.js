@@ -1,60 +1,19 @@
-//on importe mongoose
-const mongoose = require('mongoose');
+// pour créer un schéma de données qui contient les champs souhaités pour chaque sauce
+const mongoose = require('mongoose'); // pour importer mongoose
 
-// création d'un schéma sauce avec champs obligatoires
-
-const sauceSchema = mongoose.Schema({
-    //id de la sauce pas besoin d'un champs il est généré par Mongoose
-    //id de l'utilisateur
-    userId: {
-        type: String,
-        required: true
-    },
-    //nom de la sauce
-    name: {
-        type: String,
-        required: true
-    },
-    //créateur de la sauce
-    manufacturer: {
-        type: String,
-        required: true
-    },
-    //description de la sauce
-    description: {
-        type: String,
-        required: true
-    },
-    //ingrédient piquant
-    mainPepper: {
-        type: String,
-        required: true
-    },
-    //image de la sauce
-    imageUrl: {
-        type: String,
-        required: true
-    },
-    //level de piquant
-    heat: {
-        type: Number,
-        required: true
-    },
-    //nombre de like
-    likes: {
-        type: Number,
-        required: true
-    },
-    //nombre de dislike
-    dislikes: {
-        type: Number,
-        required: true
-    },
-    //like utilisateur
-    usersLiked: [String],
-    //dislike utilisateur
-    usersDisliked: [String],
-
+const sauceSchema = mongoose.Schema({ // on utilise la méthode Schema de Mongoose
+  userId: { type: String },
+  name: { type: String },
+  manufacturer: { type: String },
+  description: { type: String },
+  mainPepper: { type: String },
+  heat: { type: Number },
+  imageUrl: { type: String },
+  likes: { type: Number, default: 0 },
+  dislikes: { type: Number, default: 0},
+  usersLiked: { type: Array, default: [] },
+  usersDisliked: { type: Array, default: [] },
 });
-// export du schema de donné . le rendant disponible pour l'appli Express
+
+// on exporte ce schéma en tant que modèle Mongoose
 module.exports = mongoose.model('Sauce', sauceSchema);

@@ -1,51 +1,51 @@
-//installation de npm bcrypt package de chiffrement
+const bcrypt = require('bcrypt'); // pour importer le package bcrypt
+const jwt = require('jsonwebtoken'); // pour importer le package jsonwebtoken
+const User = require('../models/User'); // pour importer le schéma de données User
+//var CryptoJS = require("crypto-js");
 
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-//permet de masquer les adresses email dans la DB
-const crypt = require('crypto-js');
-
-const User = require('../models/user');
-const dotenv = require("dotenv");
-dotenv.config();
-
-//fonction qui va crypté le mot de passe qui va le prendre et creer un nouveau user 
-//avec ce mot de passe et l'email et va l'enregistrer dans la base de donnée
 exports.signup = (req, res, next) => {
-    const cryptoEmail = crypt.MD5(req.body.email).toString();
-    bcrypt.hash(req.body.password, 10)
+    const regexPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{6,})/ // on utilise un regex pour le mot de passe
+     if (!regexPassword.test(req.body.password)){ 
+        res.status(406).json({ message: 'Mot de passe incorrect' })  
+        return false
+     }
+    /*var encrypted = CryptoJS.AES.encrypt(req.body.email, 'my email').toString();
+    //console.log(encrypted)
+    var decrypted  = CryptoJS.AES.decrypt(encrypted, 'my email');
+    console.log(decrypted)
+    var originalText = decrypted.toString(CryptoJS.enc.Utf8);
+    console.log(originalText)*/
+
+    bcrypt.hash(req.body.password, 10) // pour appeler la fonction de hachage de bcrypt et "saler" le mot de passe 10 fois
         .then(hash => {
-            const user = new User({
-                email: cryptoEmail,
+            const user = new User({ // on créé un nouvel utilisateur avec le model mongoose
+                email: req.body.email,
                 password: hash
             });
-            user.save()
-                .then(() => res.status(201).json({ message: 'Utilisateur créé !' }))
-                .catch(error => res.status(400).json({ error }));
+            user.save() // pour enregister le nouvel utilisateur dans la base de données
+                .then(() => res.status(201).json({ message: 'Utilisateur créé !'}))
+                .catch(error => res.status(400).json({error}));
         })
         .catch(error => res.status(500).json({ error }));
 };
-//fonction qui permet au utilisateur existant de se connecter
+
 exports.login = (req, res, next) => {
-    const cryptoEmail = crypt.MD5(req.body.email).toString();
-    //findone pour trouver un seul utilisateur de la base de donnée 
-    User.findOne({ email: cryptoEmail })
-        //verifier si on a récuperer un user ou non
+    User.findOne({ email: req.body.email }) // on vérifie que l'e-mail entré par l'utilisateur correspond à un utilisateur existant de la base de données 
         .then(user => {
-            if (!user) { // si pas trouver on renvoit une erreur "Unauthorized"
+            if (!user) {
                 return res.status(401).json({ error: 'Utilisateur non trouvé !' });
             }
-            //bcrypt va comparé le mot de passe que l'utilisateur va entrer avec ce qui est déja enregistrer avec compare
-            bcrypt.compare(req.body.password, user.password)
-                .then(valid => { //valid est un boolean qui est d'abord sur true 
-                    //si c'est false il y a error
+            bcrypt.compare(req.body.password, user.password) // on utilise la fonction compare de bcrypt pour comparer le mot de passe entré par l'utilisateur avec le hash enregistré dans la base de données
+                .then(valid => {
                     if (!valid) {
                         return res.status(401).json({ error: 'Mot de passe incorrect !' });
                     }
                     res.status(200).json({
                         userId: user._id,
-                        token: jwt.sign({ userId: user._id },
-                            process.env.DB_TOKEN, { expiresIn: '24h' }
+                        token: jwt.sign( // on utilise la fonction sign dejsonwebtoken pour encoder un nouveau token
+                          { userId: user._id },
+                            process.env.JWT_RAND_SECRET, // on utilise une chaîne secrète de développement temporaire
+                            {expiresIn: '24h'} // pour définir la durée de validité du token
                         )
                     });
                 })
